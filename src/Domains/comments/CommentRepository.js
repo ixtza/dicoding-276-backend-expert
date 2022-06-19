@@ -21,16 +21,28 @@ class CommentRepository {
     throw new Error('COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
 
-  async getCommentOwner(id, theadId, owner) {
+  async getCommentStatus(id, theadId, owner) {
     throw new Error('COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
 
-  async getReplyOwner(id, threadId, reply, owner) {
+  async getReplyStatus(id, threadId, reply, owner) {
     throw new Error('COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
 
   async getCommentById(id) {
     throw new Error('COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
+  }
+
+  async getLike(threadId) {
+    throw new Error('GET_LIKE.METHOD_NOT_IMPLEMENTED');
+  }
+
+  async addLike(commentId, userId) {
+    throw new Error('ADD_LIKE.METHOD_NOT_IMPLEMENTED');
+  }
+
+  async removeLike(commentId, userId) {
+    throw new Error('REMOVE_LIKE.METHOD_NOT_IMPLEMENTED');
   }
 }
 

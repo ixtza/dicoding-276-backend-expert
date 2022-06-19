@@ -6,7 +6,7 @@ describe('a Comment entities', () => {
     const payload = {
       id: 'some-id',
       owner: 'some-owner',
-      thread: 'some-thread',
+      thread: 'thread-123',
       date: new Date('2021-08-08T07:19:09.775Z'),
     };
 
@@ -19,7 +19,7 @@ describe('a Comment entities', () => {
     const payload = {
       id: 'comment-id',
       owner: 'some-owner',
-      thread: 'some-thread',
+      thread: 'thread-123',
       date: new Date('2021-08-08T07:19:09.775Z'),
       content: 'some-content',
       reply: [],
@@ -35,7 +35,7 @@ describe('a Comment entities', () => {
     const payload = {
       id: 'reply-id',
       owner: 'some-owner',
-      thread: 'some-thread',
+      thread: 'thread-123',
       date: new Date('2021-08-08T07:19:09.775Z'),
       content: 'some-content',
       reply: true,
@@ -50,7 +50,7 @@ describe('a Comment entities', () => {
     const payload = {
       id: true,
       owner: 'some-owner',
-      thread: 'some-thread',
+      thread: 'thread-123',
       date: new Date('2021-08-08T07:19:09.775Z'),
       content: 'some-content',
       reply: true,
@@ -66,7 +66,7 @@ describe('a Comment entities', () => {
     const payload = {
       id: 'comment-id',
       owner: 'some-owner',
-      thread: 'some-thread',
+      thread: 'thread-123',
       date: new Date('2021-08-08T07:19:09.775Z'),
       content: 'some-content',
       reply: null,

@@ -1,5 +1,4 @@
 const InvariantError = require('./InvariantError');
-const AuthorizationError = require('./AuthorizationError');
 const NotFoundError = require('./NotFoundError');
 
 const DomainErrorTranslator = {
@@ -24,10 +23,6 @@ DomainErrorTranslator._directories = {
   'ADD_THREAD.TITLE_LIMIT_CHAR': new InvariantError('tidak dapat membuat thread baru karena karakter title melebihi batas limit'),
   'POST_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('tidak dapat membuat comment/reply baru karena karena properti yang dibutuhkan tidak ada'),
   'POST_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('tidak dapat membuat comment/reply baru karena tipe data tidak sesuai'),
-  'DELETE_COMMENT_USE_CASE.INVALID_COMMENT': new NotFoundError('data tidak ditemukan'),
-  'DELETE_COMMENT_USE_CASE.USER_UNAUTHORIZED': new AuthorizationError('user tidak memiliki hak akses'),
-  'DELETE_REPLY_USE_CASE.INVALID_REPLY': new NotFoundError('data tidak ditemukan'),
-  'DELETE_REPLY_USE_CASE.USER_UNAUTHORIZED': new AuthorizationError('user tidak memiliki hak akses'),
   'ADD_COMMENT_USE_CASE.INVALID_THREAD': new NotFoundError('Thread tidak ditemukan'),
 };
 

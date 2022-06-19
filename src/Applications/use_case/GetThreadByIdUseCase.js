@@ -18,22 +18,28 @@ class GetThreadByIdUseCase {
   }
 
   async execute(threadId) {
-    const dataThread = await this._threadRepository.verifyThreadAvaibility(threadId);
+    const dataThread = await this._threadRepository.getThreadById(threadId);
     const dataComment = await this._commentRepository.getCommentByThreadId(threadId);
-    const correctComment = await Promise.all(dataComment.filter((commentData) => commentData.reply == null).map(async (comment) => new DetailsComment({
-        ...comment,
-        content: (comment.is_delete ? '**komentar telah dihapus**' : comment.content),
-        username: await this._userRepository.getUsernameById(comment.owner),
-        replies: await Promise.all(dataComment.filter((commentData) => commentData.reply === comment.id).map(async (reply) => new ReplyComment({
-          ...reply,
-          content: (reply.is_delete ? '**balasan telah dihapus**' : reply.content),
-          username: await this._userRepository.getUsernameById(reply.owner),
-        }))),
-      })));
+
+    const comments = dataComment.filter((commentData) => commentData.reply == null);
+    const getReplies = (commentId) => dataComment
+      .filter((commentData) => commentData.reply === commentId)
+      .map((reply) => new ReplyComment({
+        ...reply,
+        content: (reply.is_delete ? '**balasan telah dihapus**' : reply.content),
+        username: reply.owner,
+      }));
+
+    const commentsWithReply = comments.map((comment) => new DetailsComment({
+      ...comment,
+      content: (comment.is_delete ? '**komentar telah dihapus**' : comment.content),
+      username: comment.owner,
+      replies: getReplies(comment.id),
+    }));
     return new DetailsThread({
       ...dataThread,
       username: await this._userRepository.getUsernameById(dataThread.owner),
-      comments: correctComment,
+      comments: commentsWithReply,
     });
   }
 }

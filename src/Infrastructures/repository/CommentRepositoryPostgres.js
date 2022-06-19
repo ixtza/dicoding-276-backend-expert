@@ -1,3 +1,4 @@
+const AuthorizationError = require('../../Commons/exceptions/AuthorizationError');
 const NotFoundError = require('../../Commons/exceptions/NotFoundError');
 const CommentRepository = require('../../Domains/comments/CommentRepository');
 const Comment = require('../../Domains/comments/entities/Comment');
@@ -70,7 +71,7 @@ class CommentRepositoryPostgres extends CommentRepository {
 
   async getCommentByThreadId(id) {
     const query = {
-      text: 'SELECT * FROM comments WHERE thread = $1 ORDER BY date ASC',
+      text: 'SELECT comments.id, date, thread, content, reply, is_delete, users.username as owner FROM comments left join users on comments.owner = users.id WHERE comments.thread = $1 ORDER BY date ASC',
       values: [id],
     };
 
@@ -81,10 +82,10 @@ class CommentRepositoryPostgres extends CommentRepository {
     ));
   }
 
-  async getCommentOwner(id, threadId, owner) {
+  async getCommentStatus(id, threadId, owner) {
     const query = {
-      text: 'SELECT owner FROM comments WHERE id = $1 AND thread = $2 AND owner = $3',
-      values: [id, threadId, owner],
+      text: 'SELECT owner FROM comments WHERE id = $1 AND thread = $2',
+      values: [id, threadId],
     };
 
     const result = await this._pool.query(query);
@@ -92,20 +93,26 @@ class CommentRepositoryPostgres extends CommentRepository {
     if (!result.rowCount) {
       throw new NotFoundError('comment tidak ditemukan');
     }
+    if (result.rows[0].owner !== owner) {
+      throw new AuthorizationError('user tidak memiliki hak akses');
+    }
 
     return result.rows[0].owner;
   }
 
-  async getReplyOwner(id, threadId, reply, owner) {
+  async getReplyStatus(id, threadId, reply, owner) {
     const query = {
-      text: 'SELECT owner FROM comments WHERE id = $1 AND thread = $2 AND reply= $3 AND owner = $4',
-      values: [id, threadId, reply, owner],
+      text: 'SELECT owner FROM comments WHERE id = $1 AND thread = $2 AND reply= $3',
+      values: [id, threadId, reply],
     };
 
     const result = await this._pool.query(query);
 
     if (!result.rowCount) {
       throw new NotFoundError('reply tidak ditemukan');
+    }
+    if (result.rows[0].owner !== owner) {
+      throw new AuthorizationError('user tidak memiliki hak akses');
     }
 
     return result.rows[0].owner;
@@ -122,6 +129,46 @@ class CommentRepositoryPostgres extends CommentRepository {
       throw new NotFoundError('comment tidak ditemukan');
     }
     return new Comment(result.rows[0]);
+  }
+
+  async getLike(id) {
+    const query = {
+      text: `select comments.id as id, count(user_comment_likes.id) as likes 
+      from comments 
+      inner join user_comment_likes 
+      on comments.id = user_comment_likes.comment_id 
+      where comments.thread = $1
+      group by comments.id`,
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+
+    return result;
+  }
+
+  async addLike(commentId, userId) {
+    const id = `like-${this._idGenerator()}`;
+
+    const query = {
+      text: 'INSERT INTO user_comment_likes (id, comment_id, user_id) VALUES ($1, $2, $3) Returning id',
+      values: [id, commentId, userId],
+    };
+
+    const result = await this._pool.query(query);
+
+    return result;
+  }
+
+  async removeLike(commentId, userId) {
+    const query = {
+      text: 'DELETE FROM user_comment_likes WHERE comment_id = $1 AND user_id = $2 RETURNING id',
+      values: [commentId, userId],
+    };
+
+    const result = await this._pool.query(query);
+
+    return result;
   }
 }
 

@@ -1,7 +1,9 @@
 /* eslint-disable max-len */
 const CommentTabelTestHelper = require('../../../../tests/CommentTableTestHelper');
 const ThreadTableTestHelper = require('../../../../tests/ThreadTableTestHelper');
+const UserCommentLikeTableTestHelper = require('../../../../tests/UserCommentLikeTableTestHelper');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
+const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 const Comment = require('../../../Domains/comments/entities/Comment');
 const CreatedComment = require('../../../Domains/comments/entities/CreatedComment');
@@ -74,6 +76,9 @@ describe('CommentRepositoryPostgres', () => {
       const data = await CommentTabelTestHelper.findCommentById('reply-123');
       expect(data).toHaveLength(1);
       expect(data[0].id).toBe('reply-123');
+      expect(data[0].reply).toBe('comment-123');
+      expect(data[0].thread).toBe('thread-123');
+      expect(data[0].content).toBe('some-content');
     });
   });
   describe('deleteComment function', () => {
@@ -85,7 +90,7 @@ describe('CommentRepositoryPostgres', () => {
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakerIdGenerator);
 
       // Action & Assert
-      expect(commentRepositoryPostgres.deleteComment('comment-123', 'thead-123', 'user-123'))
+      await expect(commentRepositoryPostgres.deleteComment('comment-123', 'thead-123', 'user-123'))
         .rejects
         .toThrowError(NotFoundError);
 
@@ -151,7 +156,7 @@ describe('CommentRepositoryPostgres', () => {
     it('should return empty array of comment correctly', async () => {
       // Arrange
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
-      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      await UsersTableTestHelper.addUser({ id: 'user-123', username: 'dicoding' });
       await ThreadTableTestHelper.addThread({ id: 'thread-123' });
 
       // Action
@@ -163,7 +168,7 @@ describe('CommentRepositoryPostgres', () => {
     it('should return array of comment object correctly', async () => {
       // Arrange
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
-      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      await UsersTableTestHelper.addUser({ id: 'user-123', username: 'dicoding' });
       await ThreadTableTestHelper.addThread({ id: 'thread-123' });
       await CommentTabelTestHelper.addComment({ id: 'comment-123' });
 
@@ -173,7 +178,7 @@ describe('CommentRepositoryPostgres', () => {
       // Assert
       expect(comments).toStrictEqual([new Comment({
         id: 'comment-123',
-        owner: 'user-123',
+        owner: 'dicoding',
         thread: 'thread-123',
         date: new Date('2021-08-08T00:19:09.775Z'),
         content: 'some-content',
@@ -190,7 +195,7 @@ describe('CommentRepositoryPostgres', () => {
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakerIdGenerator);
 
       // Action & Assert
-      expect(commentRepositoryPostgres.getCommentById('comment-123'))
+      await expect(commentRepositoryPostgres.getCommentById('comment-123'))
         .rejects
         .toThrowError(NotFoundError);
     });
@@ -217,16 +222,29 @@ describe('CommentRepositoryPostgres', () => {
     });
   });
 
-  describe('getCommentOwner function', () => {
+  describe('getCommentStatus function', () => {
     it('should return NotFoundError when comment is not found', async () => {
       // Arrange
       const fakerIdGenerator = () => '123';
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakerIdGenerator);
 
       // Action & Assert
-      expect(commentRepositoryPostgres.getCommentOwner('comment-123', 'thread-123', 'user-123'))
+      await expect(commentRepositoryPostgres.getCommentStatus('comment-123', 'thread-123', 'user-123'))
         .rejects
         .toThrowError(NotFoundError);
+    });
+    it('should return AuthorizationError when user is not the owner', async () => {
+      // Arrange
+      const fakerIdGenerator = () => '123';
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakerIdGenerator);
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      await ThreadTableTestHelper.addThread({ id: 'thread-123' });
+      await CommentTabelTestHelper.addComment({ id: 'comment-123' });
+
+      // Action & Assert
+      await expect(commentRepositoryPostgres.getCommentStatus('comment-123', 'thread-123', 'user-321'))
+        .rejects
+        .toThrowError(AuthorizationError);
     });
     it('should return correct comment owner', async () => {
       // Arrange
@@ -237,21 +255,35 @@ describe('CommentRepositoryPostgres', () => {
       await CommentTabelTestHelper.addComment({ id: 'comment-123' });
 
       // Action
-      const owner = await commentRepositoryPostgres.getCommentOwner('comment-123', 'thread-123', 'user-123');
+      const owner = await commentRepositoryPostgres.getCommentStatus('comment-123', 'thread-123', 'user-123');
       // Assert
       expect(owner).toEqual('user-123');
     });
   });
-  describe('getReplyOwner function', () => {
+  describe('getReplyStatus function', () => {
     it('should return NotFoundError when comment is not found', async () => {
       // Arrange
       const fakerIdGenerator = () => '123';
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakerIdGenerator);
 
       // Action & Assert
-      expect(commentRepositoryPostgres.getReplyOwner('reply-123', 'thread-123', 'comment-123', 'user-123'))
+      await expect(commentRepositoryPostgres.getReplyStatus('reply-123', 'thread-123', 'comment-123', 'user-123'))
         .rejects
         .toThrowError(NotFoundError);
+    });
+    it('should return AuthorizationError when user is not the owner', async () => {
+      // Arrange
+      const fakerIdGenerator = () => '123';
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakerIdGenerator);
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      await ThreadTableTestHelper.addThread({ id: 'thread-123' });
+      await CommentTabelTestHelper.addComment({ id: 'comment-123' });
+      await CommentTabelTestHelper.addReply({ id: 'reply-123' });
+
+      // Action & Assert
+      await expect(commentRepositoryPostgres.getReplyStatus('reply-123', 'thread-123', 'comment-123', 'user-321'))
+        .rejects
+        .toThrowError(AuthorizationError);
     });
     it('should return correct comment owner', async () => {
       // Arrange
@@ -263,9 +295,61 @@ describe('CommentRepositoryPostgres', () => {
       await CommentTabelTestHelper.addReply({ id: 'reply-123' });
 
       // Action
-      const owner = await commentRepositoryPostgres.getReplyOwner('reply-123', 'thread-123', 'comment-123', 'user-123');
+      const owner = await commentRepositoryPostgres.getReplyStatus('reply-123', 'thread-123', 'comment-123', 'user-123');
       // Assert
       expect(owner).toEqual('user-123');
+    });
+  });
+
+  describe('getLike', () => {
+    it('should return correct value', async () => {
+      // Arrange
+      const fakerIdGenerator = () => '123';
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakerIdGenerator);
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      await ThreadTableTestHelper.addThread({ id: 'thread-123' });
+      await CommentTabelTestHelper.addComment({ id: 'comment-123' });
+      await UserCommentLikeTableTestHelper.addLike({ comment_id: 'comment-123', user_id: 'user-123' });
+
+      // Action
+      const result = await commentRepositoryPostgres.getLike('thread-123');
+
+      // Assert
+      expect(result.rows).toHaveLength(1);
+      expect(result.rows[0].id).toBe('comment-123');
+      expect(result.rows[0].likes).toBe('1');
+    });
+  });
+  describe('addLike', () => {
+    it('should return correct value', async () => {
+      // Arrange
+      const fakerIdGenerator = () => '123';
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakerIdGenerator);
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      await ThreadTableTestHelper.addThread({ id: 'thread-123' });
+      await CommentTabelTestHelper.addComment({ id: 'comment-123' });
+
+      // Action
+      const result = await commentRepositoryPostgres.addLike('comment-123', 'user-123');
+      // Assert
+      expect(result.rows[0].id).toEqual('like-123');
+    });
+  });
+  describe('removeLike', () => {
+    it('should return correct value', async () => {
+      // Arrange
+      const fakerIdGenerator = () => '123';
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakerIdGenerator);
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      await ThreadTableTestHelper.addThread({ id: 'thread-123', owner: 'user-123' });
+      await CommentTabelTestHelper.addComment({ id: 'comment-123', owner: 'user-123' });
+      await UserCommentLikeTableTestHelper.addLike({ comment_id: 'comment-123', user_id: 'user-123' });
+
+      // Action
+      const result = await commentRepositoryPostgres.removeLike('comment-123', 'user-123');
+
+      // Assert
+      expect(result.rows[0].id).toEqual('like-123');
     });
   });
 });

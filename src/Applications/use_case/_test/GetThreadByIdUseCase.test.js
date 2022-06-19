@@ -58,8 +58,8 @@ describe('GetThreadByIdUseCase', () => {
       .mockImplementation(() => Promise.resolve([
         new Comment({
           id: 'comment-123',
-          owner: 'user-123',
-          thread: 'some-thread',
+          owner: 'username',
+          thread: 'thread-123',
           date: new Date('2021-08-08T07:19:09.775Z'),
           content: 'some-content',
           reply: null,
@@ -67,8 +67,8 @@ describe('GetThreadByIdUseCase', () => {
         }),
         new Comment({
           id: 'reply-123',
-          owner: 'user-132',
-          thread: 'some-thread',
+          owner: 'username',
+          thread: 'thread-123',
           date: new Date('2021-08-08T08:19:09.775Z'),
           content: 'some-content',
           reply: 'comment-123',
@@ -76,8 +76,8 @@ describe('GetThreadByIdUseCase', () => {
         }),
         new Comment({
           id: 'comment-321',
-          owner: 'user-123',
-          thread: 'some-thread',
+          owner: 'username',
+          thread: 'thread-123',
           date: new Date('2021-08-08T08:19:10.775Z'),
           content: 'some-content',
           reply: null,
@@ -85,15 +85,15 @@ describe('GetThreadByIdUseCase', () => {
         }),
         new Comment({
           id: 'reply-321',
-          owner: 'user-132',
-          thread: 'some-thread',
+          owner: 'username',
+          thread: 'thread-123',
           date: new Date('2021-08-08T08:19:12.775Z'),
           content: 'some-content',
           reply: 'comment-321',
           is_delete: true,
         }),
       ]));
-    mockThreadRepository.verifyThreadAvaibility = jest.fn()
+    mockThreadRepository.getThreadById = jest.fn()
       .mockImplementation(() => Promise.resolve(new Thread({
         id: 'thread-123',
         title: 'some-title',
@@ -116,12 +116,8 @@ describe('GetThreadByIdUseCase', () => {
 
     // Assert
     expect(createdThreadDetail).toStrictEqual(expectedThreadDetails);
-    expect(mockThreadRepository.verifyThreadAvaibility).toHaveBeenCalledWith(threadId);
+    expect(mockThreadRepository.getThreadById).toHaveBeenCalledWith(threadId);
     expect(mockCommentRepository.getCommentByThreadId).toHaveBeenCalledWith(threadId);
     expect(mockUserRepository.getUsernameById).toHaveBeenNthCalledWith(1, 'user-123');
-    expect(mockUserRepository.getUsernameById).toHaveBeenNthCalledWith(2, 'user-123');
-    expect(mockUserRepository.getUsernameById).toHaveBeenNthCalledWith(3, 'user-132');
-    expect(mockUserRepository.getUsernameById).toHaveBeenNthCalledWith(4, 'user-132');
-    expect(mockUserRepository.getUsernameById).toHaveBeenNthCalledWith(5, 'user-123');
   });
 });

@@ -31,7 +31,7 @@ describe('AddCommentUseCase', () => {
         content: 'some-content',
         owner: 'user-123',
       })));
-    mockThreadRepository.verifyThreadAvaibility = jest.fn()
+    mockThreadRepository.getThreadById = jest.fn()
       .mockImplementation(() => Promise.resolve());
 
     /** creating use case instance */
@@ -48,6 +48,6 @@ describe('AddCommentUseCase', () => {
     expect(mockCommentRepository.addComment).toHaveBeenCalledWith(userId, threadId, new PostComment({
       content: useCasePayload.content,
     }));
-    expect(mockThreadRepository.verifyThreadAvaibility).toHaveBeenCalledWith(threadId);
+    expect(mockThreadRepository.getThreadById).toHaveBeenCalledWith(threadId);
   });
 });
