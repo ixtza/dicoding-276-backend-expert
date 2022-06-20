@@ -22,6 +22,7 @@ describe('GetThreadByIdUseCase', () => {
           username: 'username',
           content: 'some-content',
           date: new Date('2021-08-08T07:19:09.775Z'),
+          likeCount: 1,
           replies: [
             new ReplyComment({
               id: 'reply-123',
@@ -36,6 +37,7 @@ describe('GetThreadByIdUseCase', () => {
           username: 'username',
           content: '**komentar telah dihapus**',
           date: new Date('2021-08-08T08:19:10.775Z'),
+          likeCount: 0,
           replies: [
             new ReplyComment({
               id: 'reply-321',
@@ -101,6 +103,8 @@ describe('GetThreadByIdUseCase', () => {
         date: new Date('2021-08-08T07:19:09.775Z'),
         owner: 'user-123',
       })));
+    mockCommentRepository.getLike = jest.fn()
+      .mockImplementation(() => Promise.resolve([{ id: 'comment-123', likes: '1' }]));
     mockUserRepository.getUsernameById = jest.fn()
       .mockImplementation(() => Promise.resolve('username'));
 
@@ -118,6 +122,7 @@ describe('GetThreadByIdUseCase', () => {
     expect(createdThreadDetail).toStrictEqual(expectedThreadDetails);
     expect(mockThreadRepository.getThreadById).toHaveBeenCalledWith(threadId);
     expect(mockCommentRepository.getCommentByThreadId).toHaveBeenCalledWith(threadId);
+    expect(mockCommentRepository.getLike).toHaveBeenCalledWith(threadId);
     expect(mockUserRepository.getUsernameById).toHaveBeenNthCalledWith(1, 'user-123');
   });
 });

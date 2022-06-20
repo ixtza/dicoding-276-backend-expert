@@ -301,6 +301,37 @@ describe('CommentRepositoryPostgres', () => {
     });
   });
 
+  describe('getLikeStatus', () => {
+    it('should return false', async () => {
+      // Arrange
+      const fakerIdGenerator = () => '123';
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakerIdGenerator);
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      await ThreadTableTestHelper.addThread({ id: 'thread-123' });
+      await CommentTabelTestHelper.addComment({ id: 'comment-123' });
+
+      // Action
+      const result = await commentRepositoryPostgres.getLikeStatus('comment-123', 'user-123');
+
+      // Assert
+      expect(result).toBeFalsy();
+    });
+    it('should return true', async () => {
+      // Arrange
+      const fakerIdGenerator = () => '123';
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakerIdGenerator);
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      await ThreadTableTestHelper.addThread({ id: 'thread-123' });
+      await CommentTabelTestHelper.addComment({ id: 'comment-123' });
+      await UserCommentLikeTableTestHelper.addLike({ comment_id: 'comment-123', user_id: 'user-123' });
+
+      // Action
+      const result = await commentRepositoryPostgres.getLikeStatus('comment-123', 'user-123');
+
+      // Assert
+      expect(result).toBeTruthy();
+    });
+  });
   describe('getLike', () => {
     it('should return correct value', async () => {
       // Arrange
@@ -315,9 +346,9 @@ describe('CommentRepositoryPostgres', () => {
       const result = await commentRepositoryPostgres.getLike('thread-123');
 
       // Assert
-      expect(result.rows).toHaveLength(1);
-      expect(result.rows[0].id).toBe('comment-123');
-      expect(result.rows[0].likes).toBe('1');
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('comment-123');
+      expect(result[0].likes).toBe('1');
     });
   });
   describe('addLike', () => {

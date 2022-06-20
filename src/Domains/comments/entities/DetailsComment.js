@@ -7,6 +7,7 @@ class DetailsComment {
       username,
       content,
       date,
+      likeCount,
       replies,
     } = payload;
 
@@ -14,6 +15,7 @@ class DetailsComment {
     this.username = username;
     this.content = content;
     this.date = date;
+    this.likeCount = likeCount === undefined ? 0 : likeCount;
     this.replies = replies;
   }
 
