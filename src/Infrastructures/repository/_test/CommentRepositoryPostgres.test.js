@@ -47,6 +47,12 @@ describe('CommentRepositoryPostgres', () => {
       const data = await CommentTabelTestHelper.findCommentById('comment-123');
       expect(data).toHaveLength(1);
       expect(data[0].id).toBe('comment-123');
+      expect(data[0].owner).toBe('user-123');
+      expect(data[0].thread).toBe('thread-123');
+      expect(data[0].content).toBe('some-content');
+      expect(data[0].is_delete).toBeFalsy();
+      expect(data[0].reply).toBeNull();
+      expect(data[0].date).toBeInstanceOf(Date);
     });
   });
   describe('addReply funcion', () => {
