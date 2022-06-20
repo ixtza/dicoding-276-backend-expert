@@ -164,6 +164,40 @@ describe('/threads/{threadId}/comments endpoint', () => {
         expect(responseJson.status).toEqual('success');
       });
     });
+
+    describe('when PUT /threads/{threadId}/comments/{commentsId}/likes', () => {
+      it('should response 200 and seccess status', async () => {
+        // Arrange
+        const server = await createServer(container);
+
+        userId = await UsersTableTestHelper.findIdByUsername('dicoding');
+        await ThreadTableTestHelper.addThread({ id: 'thread-123', owner: userId });
+        await CommentTabelTestHelper.addComment({
+          id: 'comment-123',
+          owner: userId,
+          thread: 'thread-123',
+        });
+        await CommentTabelTestHelper.addComment({
+          id: 'reply-123',
+          reply: 'comment-123',
+          owner: userId,
+        });
+
+        // Action
+        const response = await server.inject({
+          method: 'PUT',
+          url: '/threads/thread-123/comments/comment-123/likes',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        // Assert
+        const responseJson = JSON.parse(response.payload);
+        expect(response.statusCode).toEqual(200);
+        expect(responseJson.status).toEqual('success');
+      });
+    });
   });
 
   // describe('when GET /thread/{threadId}', () => {

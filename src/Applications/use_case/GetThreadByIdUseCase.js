@@ -1,4 +1,3 @@
-/* eslint-disable indent */
 /* eslint-disable max-len */
 const DetailsThread = require('../../Domains/threads/entities/DetailsThread');
 // const Thread = require('../../Domains/threads/entities/Thread');
@@ -20,8 +19,10 @@ class GetThreadByIdUseCase {
   async execute(threadId) {
     const dataThread = await this._threadRepository.getThreadById(threadId);
     const dataComment = await this._commentRepository.getCommentByThreadId(threadId);
+    const dataLike = await this._commentRepository.getLike(threadId);
 
     const comments = dataComment.filter((commentData) => commentData.reply == null);
+    const getLikes = (commentId) => dataLike.filter((like) => like.id === commentId).map((data) => data.likes)[0];
     const getReplies = (commentId) => dataComment
       .filter((commentData) => commentData.reply === commentId)
       .map((reply) => new ReplyComment({
@@ -34,6 +35,7 @@ class GetThreadByIdUseCase {
       ...comment,
       content: (comment.is_delete ? '**komentar telah dihapus**' : comment.content),
       username: comment.owner,
+      likeCount: (getLikes(comment.id) ? parseInt(getLikes(comment.id), 10) : 0),
       replies: getReplies(comment.id),
     }));
     return new DetailsThread({

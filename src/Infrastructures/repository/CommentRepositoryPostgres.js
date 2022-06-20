@@ -131,11 +131,26 @@ class CommentRepositoryPostgres extends CommentRepository {
     return new Comment(result.rows[0]);
   }
 
+  async getLikeStatus(commentId, userId) {
+    const query = {
+      text: 'select * from user_comment_likes where comment_id = $1 and  user_id = $2',
+      values: [commentId, userId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      return false;
+    }
+
+    return true;
+  }
+
   async getLike(id) {
     const query = {
       text: `select comments.id as id, count(user_comment_likes.id) as likes 
       from comments 
-      inner join user_comment_likes 
+      left join user_comment_likes 
       on comments.id = user_comment_likes.comment_id 
       where comments.thread = $1
       group by comments.id`,
@@ -144,7 +159,7 @@ class CommentRepositoryPostgres extends CommentRepository {
 
     const result = await this._pool.query(query);
 
-    return result;
+    return result.rows;
   }
 
   async addLike(commentId, userId) {

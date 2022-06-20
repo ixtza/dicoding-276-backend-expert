@@ -33,6 +33,10 @@ class CommentRepository {
     throw new Error('COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
 
+  async getLikeStatus(commentId, userId) {
+    throw new Error('GET_LIKE_STATUS.METHOD_NOT_IMPLEMENTED');
+  }
+
   async getLike(threadId) {
     throw new Error('GET_LIKE.METHOD_NOT_IMPLEMENTED');
   }
