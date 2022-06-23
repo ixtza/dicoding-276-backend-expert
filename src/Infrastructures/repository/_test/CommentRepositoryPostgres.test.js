@@ -370,6 +370,11 @@ describe('CommentRepositoryPostgres', () => {
       const result = await commentRepositoryPostgres.addLike('comment-123', 'user-123');
       // Assert
       expect(result.rows[0].id).toEqual('like-123');
+      const data = await UserCommentLikeTableTestHelper.getLikeById('like-123');
+      expect(data).toHaveLength(1);
+      expect(data[0].id).toEqual('like-123');
+      expect(data[0].user_id).toEqual('user-123');
+      expect(data[0].comment_id).toEqual('comment-123');
     });
   });
   describe('removeLike', () => {
@@ -387,6 +392,8 @@ describe('CommentRepositoryPostgres', () => {
 
       // Assert
       expect(result.rows[0].id).toEqual('like-123');
+      const data = await UserCommentLikeTableTestHelper.getLikeById('like-123');
+      expect(data).toHaveLength(0);
     });
   });
 });
