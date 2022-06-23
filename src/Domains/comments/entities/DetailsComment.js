@@ -15,7 +15,7 @@ class DetailsComment {
     this.username = username;
     this.content = content;
     this.date = date;
-    this.likeCount = likeCount === undefined ? 0 : likeCount;
+    this.likeCount = likeCount;
     this.replies = replies;
   }
 
@@ -25,6 +25,7 @@ class DetailsComment {
     content,
     date,
     replies,
+    likeCount,
   }) {
     if (
       !id
@@ -32,6 +33,7 @@ class DetailsComment {
       || !content
       || !date
       || !replies
+      || (typeof likeCount === 'undefined')
     ) {
       throw new Error('DETAILS_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
     }
@@ -40,6 +42,7 @@ class DetailsComment {
       || typeof username !== 'string'
       || typeof content !== 'string'
       || typeof date !== 'object'
+      || typeof likeCount !== 'number'
       || Array.isArray(replies) !== true
     ) {
       throw new Error('DETAILS_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION');

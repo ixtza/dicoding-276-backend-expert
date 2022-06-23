@@ -1,9 +1,8 @@
 # dicoding-276-backend-expert
 
-Domain:
+TODO:
 
-- https://loud-duck-83.a276.dcdg.xyz/ (online)
-- https://www.loud-duck-83.a276.dcdg.xyz/ (online)
+- Make repository function more concise
 
 Dokumentasi:
 

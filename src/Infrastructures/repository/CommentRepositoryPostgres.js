@@ -78,7 +78,7 @@ class CommentRepositoryPostgres extends CommentRepository {
     const result = await this._pool.query(query);
 
     return result.rows.map((comment) => (
-      new Comment({ ...comment })
+      new Comment(comment)
     ));
   }
 
@@ -139,11 +139,7 @@ class CommentRepositoryPostgres extends CommentRepository {
 
     const result = await this._pool.query(query);
 
-    if (!result.rowCount) {
-      return false;
-    }
-
-    return true;
+    return result.rowCount;
   }
 
   async getLike(id) {
