@@ -12,6 +12,15 @@ const UserCommentLikeTableTestHelper = {
     };
     await pool.query(query);
   },
+  async getLikeById(id) {
+    const query = {
+      text: 'SELECT * FROM user_comment_likes WHERE id = $1',
+      values: [id],
+    };
+
+    const result = await pool.query(query);
+    return result.rows;
+  },
 };
 
 module.exports = UserCommentLikeTableTestHelper;

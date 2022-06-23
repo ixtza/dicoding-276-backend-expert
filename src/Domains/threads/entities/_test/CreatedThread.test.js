@@ -1,4 +1,4 @@
-const CreatedThread = require('../CraetedThread');
+const CreatedThread = require('../CreatedThread');
 
 describe('a CreatedThread entities', () => {
   it('should throw error when payload did not contain needed property', () => {

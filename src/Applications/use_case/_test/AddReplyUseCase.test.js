@@ -26,16 +26,14 @@ describe('AddCommentUseCase', () => {
     const mockThreadRepository = {};
 
     /** mocking needed function */
-    mockCommentRepository.addReply = jest.fn()
-      .mockImplementation(() => Promise.resolve(new CreatedComment({
-        id: 'reply-123',
-        content: 'some-content',
-        owner: 'user-123',
-      })));
-    mockCommentRepository.getCommentById = jest.fn()
-      .mockImplementation(() => Promise.resolve());
-    mockThreadRepository.getThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve());
+    mockCommentRepository.addReply = jest.fn(() => Promise.resolve(new CreatedComment({
+      id: 'reply-123',
+      content: 'some-content',
+      owner: 'user-123',
+    })));
+    mockCommentRepository.getCommentById = jest.fn(() => Promise.resolve());
+
+    mockThreadRepository.getThreadById = jest.fn(() => Promise.resolve());
 
     /** creating use case instance */
     const addReplyUsecase = new AddReplyUseCase({

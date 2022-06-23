@@ -1,5 +1,4 @@
 /* eslint-disable max-len */
-const CreatedComment = require('../../Domains/comments/entities/CreatedComment');
 const PostComment = require('../../Domains/comments/entities/PostComment');
 
 class AddReplyUseCase {
@@ -12,8 +11,7 @@ class AddReplyUseCase {
     const postComment = new PostComment(useCasePayload);
     await this._threadRepository.getThreadById(threadId);
     await this._commentRepository.getCommentById(commentId);
-    const createdComment = await this._commentRepository.addReply(userId, threadId, commentId, postComment);
-    return new CreatedComment({ ...createdComment });
+    return this._commentRepository.addReply(userId, threadId, commentId, postComment);
   }
 }
 

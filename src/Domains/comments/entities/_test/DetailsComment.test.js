@@ -18,6 +18,7 @@ describe('a DetailsComment entities', () => {
       content: 'benar',
       date: 321,
       replies: true,
+      likeCount: true,
     };
     // Action and Assert
     expect(() => new DetailsComment(payload)).toThrowError('DETAILS_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION');
@@ -30,6 +31,7 @@ describe('a DetailsComment entities', () => {
       content: 'some-content',
       date: new Date('2021-08-08T07:19:09.775Z'),
       replies: ['some-array'],
+      likeCount: 1,
     };
 
     // Action

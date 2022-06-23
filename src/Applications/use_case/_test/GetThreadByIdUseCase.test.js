@@ -56,57 +56,53 @@ describe('GetThreadByIdUseCase', () => {
     const mockUserRepository = {};
 
     /** mocking needed function */
-    mockCommentRepository.getCommentByThreadId = jest.fn()
-      .mockImplementation(() => Promise.resolve([
-        new Comment({
-          id: 'comment-123',
-          owner: 'username',
-          thread: 'thread-123',
-          date: new Date('2021-08-08T07:19:09.775Z'),
-          content: 'some-content',
-          reply: null,
-          is_delete: false,
-        }),
-        new Comment({
-          id: 'reply-123',
-          owner: 'username',
-          thread: 'thread-123',
-          date: new Date('2021-08-08T08:19:09.775Z'),
-          content: 'some-content',
-          reply: 'comment-123',
-          is_delete: false,
-        }),
-        new Comment({
-          id: 'comment-321',
-          owner: 'username',
-          thread: 'thread-123',
-          date: new Date('2021-08-08T08:19:10.775Z'),
-          content: 'some-content',
-          reply: null,
-          is_delete: true,
-        }),
-        new Comment({
-          id: 'reply-321',
-          owner: 'username',
-          thread: 'thread-123',
-          date: new Date('2021-08-08T08:19:12.775Z'),
-          content: 'some-content',
-          reply: 'comment-321',
-          is_delete: true,
-        }),
-      ]));
-    mockThreadRepository.getThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve(new Thread({
-        id: 'thread-123',
-        title: 'some-title',
-        body: 'some-body',
+    mockCommentRepository.getCommentByThreadId = jest.fn(() => Promise.resolve([
+      new Comment({
+        id: 'comment-123',
+        owner: 'username',
+        thread: 'thread-123',
         date: new Date('2021-08-08T07:19:09.775Z'),
-        owner: 'user-123',
-      })));
-    mockCommentRepository.getLike = jest.fn()
-      .mockImplementation(() => Promise.resolve([{ id: 'comment-123', likes: '1' }]));
-    mockUserRepository.getUsernameById = jest.fn()
-      .mockImplementation(() => Promise.resolve('username'));
+        content: 'some-content',
+        reply: null,
+        is_delete: false,
+      }),
+      new Comment({
+        id: 'reply-123',
+        owner: 'username',
+        thread: 'thread-123',
+        date: new Date('2021-08-08T08:19:09.775Z'),
+        content: 'some-content',
+        reply: 'comment-123',
+        is_delete: false,
+      }),
+      new Comment({
+        id: 'comment-321',
+        owner: 'username',
+        thread: 'thread-123',
+        date: new Date('2021-08-08T08:19:10.775Z'),
+        content: 'some-content',
+        reply: null,
+        is_delete: true,
+      }),
+      new Comment({
+        id: 'reply-321',
+        owner: 'username',
+        thread: 'thread-123',
+        date: new Date('2021-08-08T08:19:12.775Z'),
+        content: 'some-content',
+        reply: 'comment-321',
+        is_delete: true,
+      }),
+    ]));
+    mockThreadRepository.getThreadById = jest.fn(() => Promise.resolve(new Thread({
+      id: 'thread-123',
+      title: 'some-title',
+      body: 'some-body',
+      date: new Date('2021-08-08T07:19:09.775Z'),
+      owner: 'user-123',
+    })));
+    mockCommentRepository.getLike = jest.fn(() => Promise.resolve([{ id: 'comment-123', likes: '1' }]));
+    mockUserRepository.getUsernameById = jest.fn(() => Promise.resolve('username'));
 
     /** creating use case instance */
     const getThreadByIdUseCase = new GetThreadByIdUseCase({
